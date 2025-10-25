@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictive Modeling for Heart Disease Diagnosis - AI-Powered</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .stats-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .stats-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .form-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .form-content {
+            padding: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #999;
+        }
+
+        .submit-section {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .predict-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .predict-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            grid-column: 1 / -1;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            text-align: left;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+            text-align: center;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 1rem;
+        }
+
+        .diagnostic-report {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .diagnosis-main {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .diagnosis-critical {
+            background: #dc3545;
+            color: white;
+        }
+
+        .diagnosis-high {
+            background: #fd7e14;
+            color: white;
+        }
+
+        .diagnosis-moderate {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .diagnosis-low-moderate {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .diagnosis-low {
+            background: #28a745;
+            color: white;
+        }
+
+        .confidence-level {
+            font-size: 1.1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .report-details {
+            margin-bottom: 2rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-row .label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .detail-row .value {
+            font-weight: 700;
+            color: #667eea;
+            background: #f8f9fa;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .risk-factors-section {
+            margin-bottom: 2rem;
+        }
+
+        .risk-factors-section h4 {
+            color: #495057;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .risk-factors-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .risk-factors-list li {
+            background: #fff3cd;
+            color: #856404;
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            border-left: 4px solid #ffc107;
+            font-size: 0.9rem;
+        }
+
+        .recommendation-section {
+            margin-bottom: 2rem;
+        }
+
+        .recommendation-section h4 {
+            color: #495057;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .recommendation-text {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #17a2b8;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .report-footer {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-top: 2px solid #dee2e6;
+            font-size: 0.85rem;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        .report-footer p {
+            margin: 0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .form-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <h1>🔬 Predictive Modeling for Heart Disease Diagnosis</h1>
+        <div class="user-info">
+            <span>Welcome, {{ session.username }}!</span>
+            <a href="{{ url_for('training_stats') }}" class="stats-btn">📊 Training Stats</a>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Comprehensive Cardiac Diagnostic Assessment</h2>
+                <p>Enter patient health records for AI-powered diagnostic modeling and risk stratification</p>
+            </div>
+
+            <div class="form-content">
+                <form id="predictionForm">
+                    <div class="form-grid">
+                        <!-- Left Column -->
+                        <div class="left-column">
+                            <div class="form-group">
+                                <label for="age">Age</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-user"></i>
+                                    <input type="number" id="age" name="age" required placeholder="Enter your age" min="1" max="120">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="chest_pain_type">Chest Pain Type</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-heart"></i>
+                                    <select id="chest_pain_type" name="chest_pain_type" required>
+                                        <option value="">Select chest pain type</option>
+                                        <option value="0">Typical Angina</option>
+                                        <option value="1">Atypical Angina</option>
+                                        <option value="2">Non-anginal Pain</option>
+                                        <option value="3">Asymptomatic</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="serum_cholesterol">Serum Cholesterol (mg/dl)</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-flask"></i>
+                                    <input type="number" id="serum_cholesterol" name="serum_cholesterol" required placeholder="126-564 mg/dl" min="100" max="600">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="resting_ecg">Resting ECG Results</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-heartbeat"></i>
+                                    <select id="resting_ecg" name="resting_ecg" required>
+                                        <option value="">Select ECG result</option>
+                                        <option value="0">Normal</option>
+                                        <option value="1">ST-T Wave Abnormality</option>
+                                        <option value="2">Left Ventricular Hypertrophy</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="exercise_angina">Exercise-induced Angina</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-running"></i>
+                                    <select id="exercise_angina" name="exercise_angina" required>
+                                        <option value="">Select option</option>
+                                        <option value="No">No</option>
+                                        <option value="Yes">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="st_slope">ST Segment Slope</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-chart-line"></i>
+                                    <select id="st_slope" name="st_slope" required>
+                                        <option value="">Select slope type</option>
+                                        <option value="0">Upsloping</option>
+                                        <option value="1">Flat</option>
+                                        <option value="2">Downsloping</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="thalassemia">Thalassemia</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-dna"></i>
+                                    <select id="thalassemia" name="thalassemia" required>
+                                        <option value="">Select thalassemia type</option>
+                                        <option value="0">Normal</option>
+                                        <option value="1">Fixed Defect</option>
+                                        <option value="2">Reversable Defect</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="right-column">
+                            <div class="form-group">
+                                <label for="sex">Sex</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-venus-mars"></i>
+                                    <select id="sex" name="sex" required>
+                                        <option value="">Select gender</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Male">Male</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="resting_bp">Resting Blood Pressure (mmHg)</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-stethoscope"></i>
+                                    <input type="number" id="resting_bp" name="resting_bp" required placeholder="94-200 mmHg" min="80" max="250">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="fasting_bs">Fasting Blood Sugar</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-tint"></i>
+                                    <select id="fasting_bs" name="fasting_bs" required>
+                                        <option value="">Select blood sugar level</option>
+                                        <option value="≤ 120 mg/dl">≤ 120 mg/dl</option>
+                                        <option value="> 120 mg/dl">> 120 mg/dl</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="max_heart_rate">Max Heart Rate</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-heart"></i>
+                                    <input type="number" id="max_heart_rate" name="max_heart_rate" required placeholder="Enter max heart rate" min="60" max="220">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="st_depression">ST Depression</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-chart-line"></i>
+                                    <input type="number" id="st_depression" name="st_depression" required placeholder="Enter ST depression value" min="0" max="10" step="0.1">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="major_vessels">Number of Major Vessels</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-route"></i>
+                                    <select id="major_vessels" name="major_vessels" required>
+                                        <option value="">Select vessel count</option>
+                                        <option value="0">0</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="submit-section">
+                        <button type="submit" class="predict-btn" id="predictBtn">
+                            <i class="fas fa-brain"></i> Generate Diagnostic Assessment
+                        </button>
+                    </div>
+                </form>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing patient health records with AI diagnostic modeling...</p>
+                </div>
+
+                <div class="result-section" id="resultSection">
+                    <h3 class="result-title">Diagnostic Report</h3>
+                    <div class="diagnostic-report" id="diagnosticReport">
+                        <div class="report-header">
+                            <div class="diagnosis-main" id="diagnosisMain"></div>
+                            <div class="confidence-level" id="confidenceLevel"></div>
+                            <div class="learning-status" id="learningStatus"></div>
+                        </div>
+                        
+                        <div class="report-details">
+                            <div class="detail-row">
+                                <span class="label">Diagnostic Score:</span>
+                                <span class="value" id="diagnosticScore"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Severity Level:</span>
+                                <span class="value" id="severityLevel"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Risk Factors Identified:</span>
+                                <span class="value" id="riskFactorsCount"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-factors-section">
+                            <h4>Identified Risk Factors:</h4>
+                            <ul class="risk-factors-list" id="riskFactorsList"></ul>
+                        </div>
+                        
+                        <div class="recommendation-section">
+                            <h4>Clinical Recommendation:</h4>
+                            <p class="recommendation-text" id="recommendationText"></p>
+                        </div>
+                        
+                        <div class="report-footer">
+                            <p><strong>Note:</strong> This diagnostic assessment is based on predictive modeling algorithms and should be interpreted by qualified healthcare professionals. Always consult with your physician for proper medical evaluation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            
+            // Convert form data to JSON
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+            
+            // Show loading
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('resultSection').classList.remove('show');
+            document.getElementById('predictBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const prediction = result.prediction;
+                    
+                    // Display main diagnosis
+                    const diagnosisMain = document.getElementById('diagnosisMain');
+                    diagnosisMain.textContent = prediction.diagnosis;
+                    
+                    // Set appropriate styling based on severity
+                    diagnosisMain.className = 'diagnosis-main';
+                    if (prediction.severity === 'Critical') {
+                        diagnosisMain.classList.add('diagnosis-critical');
+                    } else if (prediction.severity === 'High') {
+                        diagnosisMain.classList.add('diagnosis-high');
+                    } else if (prediction.severity === 'Moderate') {
+                        diagnosisMain.classList.add('diagnosis-moderate');
+                    } else if (prediction.severity === 'Low-Moderate') {
+                        diagnosisMain.classList.add('diagnosis-low-moderate');
+                    } else {
+                        diagnosisMain.classList.add('diagnosis-low');
+                    }
+                    
+                    // Display confidence level
+                    document.getElementById('confidenceLevel').textContent = `Confidence Level: ${prediction.confidence}`;
+                    
+                    // Display learning status
+                    document.getElementById('learningStatus').textContent = prediction.learning_status;
+                    
+                    // Display diagnostic details
+                    document.getElementById('diagnosticScore').textContent = prediction.diagnostic_score;
+                    document.getElementById('severityLevel').textContent = prediction.severity;
+                    document.getElementById('riskFactorsCount').textContent = prediction.total_risk_factors;
+                    
+                    // Display risk factors
+                    const riskFactorsList = document.getElementById('riskFactorsList');
+                    riskFactorsList.innerHTML = '';
+                    prediction.risk_factors.forEach(factor => {
+                        const li = document.createElement('li');
+                        li.textContent = factor;
+                        riskFactorsList.appendChild(li);
+                    });
+                    
+                    // Display recommendation
+                    document.getElementById('recommendationText').textContent = prediction.recommendation;
+                    
+                    document.getElementById('resultSection').classList.add('show');
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                // Hide loading
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('predictBtn').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

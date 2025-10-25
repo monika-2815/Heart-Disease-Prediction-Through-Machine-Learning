@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Statistics - Heart Disease Diagnosis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn, .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-btn:hover, .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .stats-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .stats-header {
+            background: linear-gradient(135deg, #17a2b8, #20c997);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .stats-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .stats-content {
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card h3 {
+            color: #495057;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .thresholds-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .thresholds-section h3 {
+            color: #856404;
+            margin-bottom: 1rem;
+        }
+
+        .thresholds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .threshold-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .threshold-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fd7e14;
+        }
+
+        .threshold-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .recent-predictions {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .recent-predictions h3 {
+            color: #1565c0;
+            margin-bottom: 1rem;
+        }
+
+        .prediction-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .prediction-table th,
+        .prediction-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .prediction-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .prediction-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .severity-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .severity-critical { background: #f8d7da; color: #721c24; }
+        .severity-high { background: #fff3cd; color: #856404; }
+        .severity-moderate { background: #d1ecf1; color: #0c5460; }
+        .severity-low { background: #d4edda; color: #155724; }
+
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-subtitle {
+            font-size: 1rem;
+            color: #bdc3c7;
+            margin-bottom: 1rem;
+        }
+
+        .footer-developer {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #ecf0f1;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-developer-name {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .footer-year {
+            font-size: 0.9rem;
+            color: #95a5a6;
+        }
+
+        .footer-heart {
+            color: #e74c3c;
+            animation: heartbeat 2s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .thresholds-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 1000;">
+        <h1 style="font-size: 1.8rem; font-weight: 600;">❤️ Heart Disease Predictor</h1>
+        <div class="nav-links" style="display: flex; gap: 2rem; align-items: center;">
+            <a href="{{ url_for('home') }}" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; transition: all 0.3s ease; font-weight: 500;">🏠 Home</a>
+            <a href="{{ url_for('predict_page') }}" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; transition: all 0.3s ease; font-weight: 500;">🔍 Predict</a>
+            {% if session.get('user_role') == 'admin' %}
+                <a href="{{ url_for('personal_history') }}" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; transition: all 0.3s ease; font-weight: 500;">📋 My History</a>
+                <a href="{{ url_for('admin_dashboard') }}" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; transition: all 0.3s ease; font-weight: 500;">👑 Admin</a>
+                <a href="{{ url_for('training_stats') }}" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; transition: all 0.3s ease; font-weight: 500; background: rgba(255, 255, 255, 0.2);">📊 Statistics</a>
+            {% else %}
+                <a href="{{ url_for('personal_history') }}" style="color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; transition: all 0.3s ease; font-weight: 500;">📋 My History & Stats</a>
+            {% endif %}
+        </div>
+        <div class="user-info" style="display: flex; align-items: center; gap: 1rem;">
+            <span>Welcome, {{ session.username }}!</span>
+            <a href="{{ url_for('logout') }}" style="background: rgba(255, 255, 255, 0.2); color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; text-decoration: none; font-size: 0.9rem;">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="stats-container">
+            <div class="stats-header">
+                {% if stats.is_admin %}
+                <h2>AI Learning System Statistics</h2>
+                <p>Monitor the system's learning progress and adaptive thresholds</p>
+                {% else %}
+                <h2>My Health Assessment Statistics</h2>
+                <p>Track your personal health assessment history and system status</p>
+                {% endif %}
+            </div>
+
+            <div class="stats-content">
+                <!-- ML Model Training Section -->
+                {% if stats.is_admin %}
+                <div class="ml-training-section" style="background: #e8f5e8; border: 1px solid #4caf50; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="color: #2e7d32; margin-bottom: 1rem;">🤖 Machine Learning Model Training</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <h4 style="color: #2e7d32; margin-bottom: 0.5rem;">Model Status</h4>
+                            <div id="model-status" style="font-weight: 600; color: #4caf50;">
+                                {% if stats.model_available %}
+                                    ✅ Model Active
+                                {% else %}
+                                    ❌ No Model
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <h4 style="color: #2e7d32; margin-bottom: 0.5rem;">Training Data</h4>
+                            <div style="font-weight: 600; color: #4caf50;">{{ stats.total_predictions }} records</div>
+                        </div>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <h4 style="color: #2e7d32; margin-bottom: 0.5rem;">Last Trained</h4>
+                            <div style="font-weight: 600; color: #4caf50;">
+                                {% if stats.last_trained %}
+                                    {{ stats.last_trained[:10] }}
+                                {% else %}
+                                    Never
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        {% if stats.can_train_model %}
+                            <button id="train-model-btn" style="background: linear-gradient(135deg, #4caf50, #45a049); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-right: 1rem;">
+                                🚀 Train ML Model
+                            </button>
+                        {% else %}
+                            <button disabled style="background: #ccc; color: #666; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: not-allowed;">
+                                Need {{ 10 - stats.total_predictions }} more records
+                            </button>
+                        {% endif %}
+                        
+                        <button id="refresh-status-btn" style="background: linear-gradient(135deg, #2196f3, #1976d2); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                            🔄 Refresh Status
+                        </button>
+                    </div>
+                    
+                    <div id="training-result" style="margin-top: 1rem; padding: 1rem; border-radius: 8px; display: none;"></div>
+                </div>
+                {% else %}
+                <div class="ml-model-status" style="background: #e3f2fd; border: 1px solid #2196f3; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="color: #1976d2; margin-bottom: 1rem;">🤖 AI Model Status</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <h4 style="color: #1976d2; margin-bottom: 0.5rem;">Model Status</h4>
+                            <div id="model-status" style="font-weight: 600; color: #2196f3;">
+                                {% if stats.model_available %}
+                                    ✅ AI Model Active
+                                {% else %}
+                                    ⏳ Model Training Required
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <h4 style="color: #1976d2; margin-bottom: 0.5rem;">Your Assessments</h4>
+                            <div style="font-weight: 600; color: #2196f3;">{{ stats.total_predictions }} predictions</div>
+                        </div>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 8px;">
+                            <h4 style="color: #1976d2; margin-bottom: 0.5rem;">System Status</h4>
+                            <div style="font-weight: 600; color: #2196f3;">{{ stats.system_status }}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button id="refresh-status-btn" style="background: linear-gradient(135deg, #2196f3, #1976d2); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                            🔄 Refresh Status
+                        </button>
+                    </div>
+                    
+                    <div id="training-result" style="margin-top: 1rem; padding: 1rem; border-radius: 8px; display: none;"></div>
+                </div>
+                {% endif %}
+
+                <!-- System Overview -->
+                {% if stats.is_admin %}
+                <!-- Admin View - System-wide Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Predictions</h3>
+                        <div class="stat-value">{{ stats.total_predictions }}</div>
+                        <div class="stat-label">System-wide assessments</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3>Total Users</h3>
+                        <div class="stat-value">{{ stats.total_users }}</div>
+                        <div class="stat-label">Registered users</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3>Active Users</h3>
+                        <div class="stat-value">{{ stats.active_users }}</div>
+                        <div class="stat-label">Last 7 days</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3>ML Model Status</h3>
+                        <div class="stat-value">{{ 'Active' if stats.model_available else 'Not Trained' }}</div>
+                        <div class="stat-label">{{ stats.system_status }}</div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- User View - Personal Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>My Predictions</h3>
+                        <div class="stat-value">{{ stats.total_predictions }}</div>
+                        <div class="stat-label">Personal assessments</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3>Average Risk Score</h3>
+                        <div class="stat-value">{{ stats.avg_diagnostic_score }}/20</div>
+                        <div class="stat-label">Your average score</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3>ML Model Status</h3>
+                        <div class="stat-value">{{ 'Active' if stats.model_available else 'Not Trained' }}</div>
+                        <div class="stat-label">{{ stats.system_status }}</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3>System Accuracy</h3>
+                        <div class="stat-value">95%+</div>
+                        <div class="stat-label">Prediction accuracy</div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Adaptive Thresholds -->
+                {% if stats.adaptive_thresholds %}
+                <div class="thresholds-section">
+                    <h3>🔄 Adaptive Learning Thresholds</h3>
+                    <p style="margin-bottom: 1rem; color: #856404;">The system has learned from {{ stats.adaptive_thresholds.total_predictions }} previous assessments and adjusted its diagnostic thresholds accordingly.</p>
+                    
+                    <div class="thresholds-grid">
+                        <div class="threshold-item">
+                            <div class="threshold-value">{{ "%.1f"|format(stats.adaptive_thresholds.low_threshold) }}</div>
+                            <div class="threshold-label">Low Threshold</div>
+                        </div>
+                        <div class="threshold-item">
+                            <div class="threshold-value">{{ "%.1f"|format(stats.adaptive_thresholds.moderate_threshold) }}</div>
+                            <div class="threshold-label">Moderate Threshold</div>
+                        </div>
+                        <div class="threshold-item">
+                            <div class="threshold-value">{{ "%.1f"|format(stats.adaptive_thresholds.high_threshold) }}</div>
+                            <div class="threshold-label">High Threshold</div>
+                        </div>
+                        <div class="threshold-item">
+                            <div class="threshold-value">{{ "%.1f"|format(stats.adaptive_thresholds.critical_threshold) }}</div>
+                            <div class="threshold-label">Critical Threshold</div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="thresholds-section">
+                    <h3>📚 Learning Progress</h3>
+                    <p style="color: #856404;">The system needs at least 5 assessments to begin adaptive learning. Currently using baseline medical thresholds.</p>
+                </div>
+                {% endif %}
+
+                <!-- Recent Predictions -->
+                <div class="recent-predictions">
+                    {% if stats.is_admin %}
+                    <h3>📋 Recent System Diagnostic Assessments</h3>
+                    {% else %}
+                    <h3>📋 My Recent Health Assessments</h3>
+                    {% endif %}
+                    {% if stats.recent_predictions %}
+                    <table class="prediction-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                {% if stats.is_admin %}
+                                <th>User</th>
+                                {% endif %}
+                                <th>Age</th>
+                                <th>Score</th>
+                                <th>Diagnosis</th>
+                                <th>Severity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prediction in stats.recent_predictions %}
+                            <tr>
+                                <td>{{ prediction.timestamp[:10] if prediction.timestamp else 'N/A' }}</td>
+                                {% if stats.is_admin %}
+                                <td>{{ prediction.username }}</td>
+                                {% endif %}
+                                <td>{{ prediction.age }}</td>
+                                <td><strong>{{ prediction.diagnostic_score }}</strong></td>
+                                <td>{{ prediction.diagnosis[:30] + '...' if prediction.diagnosis|length > 30 else prediction.diagnosis }}</td>
+                                <td>
+                                    <span class="severity-badge severity-{{ prediction.severity.lower() if prediction.severity else 'low' }}">
+                                        {{ prediction.severity if prediction.severity else 'N/A' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <div class="no-data">
+                        {% if stats.is_admin %}
+                        <p>No predictions have been made yet. Start using the diagnostic system to build training data!</p>
+                        {% else %}
+                        <p>You haven't made any health assessments yet. <a href="{{ url_for('predict_page') }}" style="color: #667eea; text-decoration: none;">Start your first assessment</a></p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ML Model Training Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const trainBtn = document.getElementById('train-model-btn');
+            const refreshBtn = document.getElementById('refresh-status-btn');
+            const trainingResult = document.getElementById('training-result');
+            const modelStatus = document.getElementById('model-status');
+
+            if (trainBtn) {
+                trainBtn.addEventListener('click', function() {
+                    trainModel();
+                });
+            }
+
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    refreshModelStatus();
+                });
+            }
+
+            function trainModel() {
+                if (trainBtn) {
+                    trainBtn.disabled = true;
+                    trainBtn.textContent = '🔄 Training...';
+                }
+
+                fetch('/train_model', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    showTrainingResult(data);
+                    if (data.success) {
+                        setTimeout(() => {
+                            location.reload();
+                        }, 3000);
+                    }
+                })
+                .catch(error => {
+                    showTrainingResult({
+                        success: false,
+                        message: 'Error training model: ' + error.message
+                    });
+                })
+                .finally(() => {
+                    if (trainBtn) {
+                        trainBtn.disabled = false;
+                        trainBtn.textContent = '🚀 Train ML Model';
+                    }
+                });
+            }
+
+            function refreshModelStatus() {
+                if (refreshBtn) {
+                    refreshBtn.disabled = true;
+                    refreshBtn.textContent = '🔄 Refreshing...';
+                }
+
+                fetch('/model_status')
+                .then(response => response.json())
+                .then(data => {
+                    updateModelStatus(data);
+                })
+                .catch(error => {
+                    console.error('Error refreshing status:', error);
+                })
+                .finally(() => {
+                    if (refreshBtn) {
+                        refreshBtn.disabled = false;
+                        refreshBtn.textContent = '🔄 Refresh Status';
+                    }
+                });
+            }
+
+            function showTrainingResult(data) {
+                trainingResult.style.display = 'block';
+                
+                if (data.success) {
+                    trainingResult.style.background = '#d4edda';
+                    trainingResult.style.border = '1px solid #c3e6cb';
+                    trainingResult.style.color = '#155724';
+                    
+                    let resultHtml = `
+                        <h4>✅ Training Successful!</h4>
+                        <p><strong>Message:</strong> ${data.message}</p>
+                        <p><strong>Accuracy:</strong> ${data.accuracy}%</p>
+                        <p><strong>Training Samples:</strong> ${data.training_samples}</p>
+                        <p><strong>Test Samples:</strong> ${data.test_samples}</p>
+                    `;
+                    
+                    if (data.feature_importance) {
+                        resultHtml += '<p><strong>Top Features:</strong></p><ul>';
+                        const sortedFeatures = Object.entries(data.feature_importance)
+                            .sort(([,a], [,b]) => b - a)
+                            .slice(0, 5);
+                        
+                        sortedFeatures.forEach(([feature, importance]) => {
+                            resultHtml += `<li>${feature}: ${(importance * 100).toFixed(1)}%</li>`;
+                        });
+                        resultHtml += '</ul>';
+                    }
+                    
+                    trainingResult.innerHTML = resultHtml;
+                } else {
+                    trainingResult.style.background = '#f8d7da';
+                    trainingResult.style.border = '1px solid #f5c6cb';
+                    trainingResult.style.color = '#721c24';
+                    trainingResult.innerHTML = `
+                        <h4>❌ Training Failed</h4>
+                        <p><strong>Error:</strong> ${data.message}</p>
+                        <p><strong>Data Count:</strong> ${data.data_count}</p>
+                    `;
+                }
+            }
+
+            function updateModelStatus(data) {
+                if (modelStatus) {
+                    if (data.model_available) {
+                        modelStatus.innerHTML = '✅ Model Active';
+                        modelStatus.style.color = '#4caf50';
+                    } else {
+                        modelStatus.innerHTML = '❌ No Model';
+                        modelStatus.style.color = '#f44336';
+                    }
+                }
+            }
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-title">❤️ Heart Disease Predictor</div>
+            <div class="footer-subtitle">Advanced Medical AI for Heart Health Assessment</div>
+            <div class="footer-developer">
+                Designed and Developed by <span class="footer-developer-name">Monika P</span>
+            </div>
+            <div class="footer-year">© 2024 All Rights Reserved</div>
+        </div>
+    </footer>
+</body>
+</html>

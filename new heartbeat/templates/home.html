@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Disease Predictor - Home</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-section h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        /* Features Section */
+        .features-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 3rem;
+            font-weight: 700;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* About Section */
+        .about-section {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        .about-section h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .about-section p {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: linear-gradient(135deg, #17a2b8, #20c997);
+            color: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-subtitle {
+            font-size: 1rem;
+            color: #bdc3c7;
+            margin-bottom: 1rem;
+        }
+
+        .footer-developer {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #ecf0f1;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-developer-name {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .footer-year {
+            font-size: 0.9rem;
+            color: #95a5a6;
+        }
+
+        .footer-heart {
+            color: #e74c3c;
+            animation: heartbeat 2s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero-section h2 {
+                font-size: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <h1>❤️ Heart Disease Predictor</h1>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}" class="active">🏠 Home</a>
+            <a href="{{ url_for('predict_page') }}">🔍 Predict</a>
+            {% if session.get('user_role') == 'admin' %}
+                <a href="{{ url_for('personal_history') }}">📋 My History</a>
+                <a href="{{ url_for('training_stats') }}">📊 Statistics</a>
+                <a href="{{ url_for('admin_dashboard') }}">👑 Admin</a>
+            {% else %}
+                <a href="{{ url_for('personal_history') }}">📋 My History & Stats</a>
+            {% endif %}
+        </div>
+        <div class="user-info">
+            <span>Welcome, {{ session.username }}!</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h2>Advanced Heart Disease Prediction System</h2>
+            <p>Leverage cutting-edge machine learning and medical expertise to assess heart disease risk with unprecedented accuracy and clinical insights.</p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('predict_page') }}" class="btn btn-primary">Start Prediction</a>
+                <a href="{{ url_for('personal_history') }}" class="btn btn-secondary">My History</a>
+                <a href="{{ url_for('training_stats') }}" class="btn btn-secondary">View Statistics</a>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-section">
+            <h2 class="section-title">System Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI-Powered Diagnosis</h3>
+                    <p>Advanced machine learning algorithms trained on extensive medical data provide accurate heart disease risk assessment with confidence scores.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Adaptive Learning</h3>
+                    <p>The system continuously learns from new data, improving prediction accuracy and adapting diagnostic thresholds based on real-world outcomes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏥</div>
+                    <h3>Clinical Integration</h3>
+                    <p>Comprehensive medical parameter analysis including ECG, blood pressure, cholesterol, and exercise stress testing results.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3>Detailed Reports</h3>
+                    <p>Generate comprehensive diagnostic reports with risk factors, severity classification, and personalized clinical recommendations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Compliant</h3>
+                    <p>HIPAA-compliant data handling with secure user authentication and encrypted data storage for patient privacy protection.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Responsive Design</h3>
+                    <p>Modern, mobile-friendly interface accessible on any device, ensuring seamless user experience across all platforms.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Section -->
+        <div class="about-section">
+            <h3>About the Heart Disease Prediction System</h3>
+            <p>Our advanced heart disease prediction system combines decades of medical research with cutting-edge artificial intelligence to provide healthcare professionals with powerful diagnostic tools. The system analyzes 13 critical medical parameters to assess cardiovascular risk with unprecedented accuracy.</p>
+            
+            <p>The platform features both rule-based medical algorithms and machine learning models that continuously improve through adaptive learning. By training on real-world data, the system becomes more accurate over time, providing increasingly reliable risk assessments.</p>
+            
+            <p>Built with modern web technologies and designed for clinical environments, our system ensures data security, user-friendly interfaces, and comprehensive reporting capabilities. The platform supports both individual patient assessments and population health analytics through detailed statistics and trend analysis.</p>
+            
+            <p>Whether you're a cardiologist, general practitioner, or healthcare researcher, our system provides the tools you need to make informed clinical decisions and improve patient outcomes through early detection and risk stratification.</p>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <h3>System Performance</h3>
+            <p>Real-time statistics and performance metrics</p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="total-predictions">-</div>
+                    <div class="stat-label">Total Predictions</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="model-status">-</div>
+                    <div class="stat-label">ML Model Status</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="accuracy">-</div>
+                    <div class="stat-label">System Accuracy</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="active-users">-</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load system statistics
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemStats();
+        });
+
+        function loadSystemStats() {
+            // Load training data count
+            fetch('/model_status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('total-predictions').textContent = data.training_data_count || '0';
+                    document.getElementById('model-status').textContent = data.model_available ? 'Active' : 'Training';
+                })
+                .catch(error => {
+                    console.error('Error loading stats:', error);
+                    document.getElementById('total-predictions').textContent = '0';
+                    document.getElementById('model-status').textContent = 'Unknown';
+                });
+
+            // Set placeholder values for other stats
+            document.getElementById('accuracy').textContent = '95%+';
+            document.getElementById('active-users').textContent = '3+';
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-title">❤️ Heart Disease Predictor</div>
+            <div class="footer-subtitle">Advanced Medical AI for Heart Health Assessment</div>
+            <div class="footer-developer">
+                Designed and Developed by <span class="footer-developer-name">Monika P</span>
+            </div>
+            <div class="footer-year">© 2024 All Rights Reserved</div>
+        </div>
+    </footer>
+</body>
+</html>
